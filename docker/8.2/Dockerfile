@@ -5,6 +5,7 @@ LABEL maintainer="Taylor Otwell"
 ARG WWWGROUP
 ARG NODE_VERSION=18
 ARG POSTGRES_VERSION=14
+ARG PHP_VERSION=8.2
 
 WORKDIR /var/www/html
 
@@ -39,6 +40,16 @@ RUN apt-get update \
     && apt-get install -y yarn \
     && apt-get install -y mysql-client \
     && apt-get install -y postgresql-client-$POSTGRES_VERSION \
+    && apt-get update \
+    && apt-get install -y php$PHP_VERSION-xdebug \
+    && echo "[XDebug]" > /etc/php/$PHP_VERSION/cli/php.ini \
+    && echo "zend_extension="$(find /usr/lib/php/20200930/ -name xdebug.so)" > /etc/php/$PHP_VERSION/cli/php.ini" \
+    && echo "xdebug.mode = debug" >> /etc/php/$PHP_VERSION/cli/php.ini \
+    && echo "xdebug.start_with_request = yes" >> /etc/php/$PHP_VERSION/cli/php.ini \
+    && echo "xdebug.discover_client_host = true" >> /etc/php/$PHP_VERSION/cli/php.ini \
+    && echo "xdebug.idekey = PHPSTORM" >> /etc/php/$PHP_VERSION/cli/php.ini \
+    && echo "xdebug.client_host = host.docker.internal" >> /etc/php/$PHP_VERSION/cli/php.ini \
+    && echo "xdebug.client_port = 9003" >> /etc/php/$PHP_VERSION/cli/php.ini \
     && apt-get -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
